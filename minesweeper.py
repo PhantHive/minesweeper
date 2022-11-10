@@ -128,7 +128,7 @@ class Sentence():
         a cell is known to be a mine.
         """
 
-        if cell in self.cells:
+        if cell in self.known_mines():
             self.cells.remove(cell)
 
     def mark_safe(self, cell):
@@ -137,9 +137,8 @@ class Sentence():
         a cell is known to be safe.
         """
 
-        if cell in self.cells:
+        if cell in self.known_safes():
             self.cells.remove(cell)
-
 
 
 class MinesweeperAI():
@@ -202,11 +201,11 @@ class MinesweeperAI():
 
         # add new sentence to knowledge base
         neighbors = set()
-        x_cell, y_cell = cell[0], cell[1]
-        for i in range(x_cell - 1, x_cell + 2):
-            for j in range(y_cell - 1, y_cell + 2):
+        y_cell, x_cell = cell[0], cell[1]
+        for i in range(y_cell - 1, y_cell + 2):
+            for j in range(x_cell - 1, x_cell + 2):
                 if 0 <= i < self.height and 0 <= j < self.width:
-                    neighbors.add((i, j)) # create neighbor set
+                    neighbors.add((i, j))  # create neighbor set
 
         neighbors_copy = deepcopy(neighbors)
         for neighbor in neighbors_copy:
@@ -217,17 +216,17 @@ class MinesweeperAI():
         # mark any additional cells as safe or as mines
         knowledge_copy = deepcopy(self.knowledge)
         for sentence in knowledge_copy:
-            for mine in sentence.known_mines():
-                self.mark_mine(mine)
-            for safe in sentence.known_safes():
-                self.mark_safe(safe)
+            # mark cells as mines
+            for cell in sentence.known_mines():
+                self.mark_mine(cell)
+            # mark cells as safe
+            for cell in sentence.known_safes():
+                self.mark_safe(cell)
 
-        # add any new sentences to the AI's knowledge base
-        for sentence in knowledge_copy:
+            # add any new sentences to the AI's knowledge base
             if len(sentence.cells) == 1:
                 for cell in sentence.cells:
                     self.add_knowledge(cell, sentence.count)
-
 
     def make_safe_move(self):
         """
@@ -240,7 +239,9 @@ class MinesweeperAI():
         """
 
         for safe in self.safes:
-            if safe not in self.moves_made:
+            if safe not in self.moves_made and safe:
+                print("safe: ", safe)
+                print("safe move", self.safes)
                 return safe
         return None
 
