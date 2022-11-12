@@ -140,7 +140,6 @@ class Sentence():
         if cell in self.known_safes():
             self.cells.remove(cell)
 
-
 class MinesweeperAI():
     """
     Minesweeper game player
@@ -239,7 +238,7 @@ class MinesweeperAI():
         """
 
         for safe in self.safes:
-            if safe not in self.moves_made and safe:
+            if safe not in self.moves_made:
                 print("safe: ", safe)
                 print("safe move", self.safes)
                 return safe
