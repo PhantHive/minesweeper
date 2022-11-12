@@ -9,7 +9,6 @@
 </h2>
 
 [![School][school-shield]][school-url]
-[![Contributors][contributors-shield]][contributors-url]
 [![Issues][issues-shield]][issues-url]
 ![Python](https://img.shields.io/badge/Python-3.10-brightgreen?&style=for-the-badge)
 </div>
@@ -50,9 +49,6 @@ No other libraries have been used and no other functions nor modifications have 
 > Project Link: [https://github.com/PhantHive/minesweeper](https://github.com/PhantHive/minesweeper/)
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[contributors-shield]: https://img.shields.io/github/contributors/PhantHive/minesweeper.svg?style=for-the-badge
-[contributors-url]: https://github.com/PhantHive/minesweeper/graphs/contributors/
-
 [issues-shield]: https://img.shields.io/github/issues/PhantHive/minesweeper.svg?style=for-the-badge
 [issues-url]: https://github.com/PhantHive/minesweeper/issues/
 
