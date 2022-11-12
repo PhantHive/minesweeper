@@ -128,9 +128,8 @@ class Sentence():
         a cell is known to be a mine.
         """
 
-        if cell in self.cells:
+        if cell in self.known_mines():
             self.cells.remove(cell)
-            self.count -= 1
 
     def mark_safe(self, cell):
         """
@@ -138,10 +137,8 @@ class Sentence():
         a cell is known to be safe.
         """
 
-        if cell in self.cells:
+        if cell in self.known_safes():
             self.cells.remove(cell)
-            self.count -= 1
-
 
 class MinesweeperAI():
     """
@@ -198,34 +195,37 @@ class MinesweeperAI():
                if they can be inferred from existing knowledge
         """
 
-        # mark the cell as a move that has been made
-        self.moves_made.add(cell)
-        # mark the cell as safe
-        self.mark_safe(cell)
-        # add a new sentence to the AI's knowledge base based on the value of `cell` and `count`
+        self.moves_made.add(cell)  # mark cell as move made
+        self.mark_safe(cell)  # mark cell as safe
+
+        # add new sentence to knowledge base
         neighbors = set()
-        for i in range(cell[0] - 1, cell[0] + 2):
-            for j in range(cell[1] - 1, cell[1] + 2):
+        y_cell, x_cell = cell[0], cell[1]
+        for i in range(y_cell - 1, y_cell + 2):
+            for j in range(x_cell - 1, x_cell + 2):
                 if 0 <= i < self.height and 0 <= j < self.width:
-                    neighbors.add((i, j))
-        neighbors.remove(cell)
+                    neighbors.add((i, j))  # create neighbor set
+
+        neighbors_copy = deepcopy(neighbors)
+        for neighbor in neighbors_copy:
+            if neighbor in self.moves_made:
+                neighbors.remove(neighbor)
         self.knowledge.append(Sentence(neighbors, count))
-        # mark any additional cells as safe or as mines if it can be concluded based on the AI's knowledge base
-        # considering that knowledge size will change
 
-        knowledge_deepcopy = deepcopy(self.knowledge)
+        # mark any additional cells as safe or as mines
+        knowledge_copy = deepcopy(self.knowledge)
+        for sentence in knowledge_copy:
+            # mark cells as mines
+            for cell in sentence.known_mines():
+                self.mark_mine(cell)
+            # mark cells as safe
+            for cell in sentence.known_safes():
+                self.mark_safe(cell)
 
-        for sentence in knowledge_deepcopy:
-            for mine in sentence.known_mines():
-                self.mark_mine(mine)
-            for safe in sentence.known_safes():
-                self.mark_safe(safe)
-
-        # add any new sentences to the AI's knowledge base if they can be inferred from existing knowledge
-        for sentence in knowledge_deepcopy:
-            for other in knowledge_deepcopy:
-                if sentence != other and sentence.cells.issubset(other.cells):
-                    self.knowledge.append(Sentence(other.cells - sentence.cells, other.count - sentence.count))
+            # add any new sentences to the AI's knowledge base
+            if len(sentence.cells) == 1:
+                for cell in sentence.cells:
+                    self.add_knowledge(cell, sentence.count)
 
     def make_safe_move(self):
         """
@@ -239,6 +239,8 @@ class MinesweeperAI():
 
         for safe in self.safes:
             if safe not in self.moves_made:
+                print("safe: ", safe)
+                print("safe move", self.safes)
                 return safe
         return None
 
